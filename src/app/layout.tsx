@@ -5,6 +5,8 @@ import { ThemeProvider } from '@/app/providers/theme-provider'
 import { Toaster } from 'sonner'
 import { Plus_Jakarta_Sans } from 'next/font/google'
 import React from 'react'
+import ReactQueryProvider from '@/app/providers/react-query-provider'
+import ReduxProvider from '@/app/providers/redux-provider'
 
 const jakarta = Plus_Jakarta_Sans({ subsets: ['latin'] })
 
@@ -27,7 +29,9 @@ export default function RootLayout({
             defaultTheme={'dark'}
             disableTransitionOnChange
           >
-            {children}
+            <ReduxProvider>
+              <ReactQueryProvider>{children}</ReactQueryProvider>
+            </ReduxProvider>
             <Toaster />
           </ThemeProvider>
         </body>

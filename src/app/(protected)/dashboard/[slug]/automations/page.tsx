@@ -5,7 +5,7 @@ import AutomationList from '@/components/global/automation-list'
 
 const Page = () => {
   return (
-    <div className={'gird grid-cols-1 lg:grid-cols-6 gap-5'}>
+    <div className="grid grid-cols-1 lg:grid-cols-6 gap-5">
       <div className={'lg:col-span-4'}>
         <AutomationList />
       </div>
