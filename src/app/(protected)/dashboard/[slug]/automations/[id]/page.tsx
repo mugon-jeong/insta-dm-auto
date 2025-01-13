@@ -1,43 +1,25 @@
 import React from 'react'
-import { Check } from 'lucide-react'
-import CreateAutomation from '@/components/global/create-automation'
-import AutomationList from '@/components/global/automation-list'
+import AutomationBreadCrumb from '@/components/global/bread-crumbs/automations'
+import { Warning } from '@/icons'
+import Trigger from '@/components/global/automations/trigger'
 
-const Page = () => {
+type Props = {
+  params: { id: string }
+}
+const Page = ({ params }: Props) => {
   return (
-    <div className={'gird grid-cols-1 lg:grid-cols-6 gap-5'}>
-      <div className={'lg:col-span-4'}>
-        <AutomationList />
-      </div>
-      <div className={'lg:col-span-2'}>
-        <div
-          className={
-            'flex flex-col rounded-xl bg-background-80 gap-y-6 p-5 border-[1px] overflow-hidden border-in-active'
-          }
-        >
-          <div>
-            <h2 className={'text-xl'}>Automations</h2>
-            <p className={'text-text-secondary'}>
-              Your live automations will show here
-            </p>
-          </div>
-          <div className={'flex flex-col gap-y-3'}>
-            {[1, 2, 3].map((item) => (
-              <div key={item} className={'flex items-start justify-between'}>
-                <div className={'flex flex-col'}>
-                  <h3 className={'font-medium'}>
-                    Direct traffic toward website
-                  </h3>
-                  <p className={'text-text-secondary text-sm'}>
-                    October 5th 2024
-                  </p>
-                </div>
-                <Check />
-              </div>
-            ))}
-          </div>
-          <CreateAutomation />
+    <div className={'flex flex-col items-center gap-y-20'}>
+      <AutomationBreadCrumb id={params.id} />
+      <div
+        className={
+          'w-full lg:w-10/12 xl:w-6/12 p-5 rounded-xl flex flex-col bg-[#1D1D1D] gap-y-3'
+        }
+      >
+        <div className={'flex gap-x-2'}>
+          <Warning />
+          When...
         </div>
+        <Trigger id={params.id} />
       </div>
     </div>
   )

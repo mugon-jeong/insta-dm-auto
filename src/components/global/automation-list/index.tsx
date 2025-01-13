@@ -3,6 +3,8 @@ import React from 'react'
 import { usePaths } from '@/hooks/user-nav'
 import Link from 'next/link'
 import { cn } from '@/lib/utils'
+import GradientButton from '@/components/global/gradient-button'
+import { Button } from '@/components/ui/button'
 
 type Props = {}
 
@@ -38,6 +40,31 @@ const AutomationList = () => {
               getstarted
             </div>
           </div>
+          <div
+            className={
+              'rounded-full border-2 mt-3 border-dashed border-white/60 px-3 py-1'
+            }
+          >
+            <p className={'text-sm text-[#bfc0c3]'}>No Keywords</p>
+          </div>
+        </div>
+        <div className={'flex flex-col justify-between'}>
+          <p className={'capitalize text-sm font-light text-[#9B9CA0]'}>
+            October 5th 2024
+          </p>
+          <GradientButton
+            type={'BUTTON'}
+            className={
+              'w-full bg-background-80 text-white hover:bg-background-80'
+            }
+          >
+            Smart AI
+          </GradientButton>
+          <Button
+            className={'bg-background-80 hover:bg-background-80 text-white'}
+          >
+            Standard
+          </Button>
         </div>
       </Link>
     </div>
