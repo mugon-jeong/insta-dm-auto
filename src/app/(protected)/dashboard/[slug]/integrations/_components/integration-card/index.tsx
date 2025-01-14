@@ -1,5 +1,8 @@
 import React from 'react'
 import { Button } from '@/components/ui/button'
+import { onOAuthInstagram } from '@/actions/integrations'
+import { useQuery } from '@tanstack/react-query'
+import { onUserInfo } from '@/actions/user'
 
 type Props = {
   title: string
@@ -8,6 +11,15 @@ type Props = {
   strategy: 'INSTAGRAM' | 'CRM'
 }
 const IntegrationCard = ({ strategy, icon, description, title }: Props) => {
+  const onInstaOauth = () => onOAuthInstagram(strategy)
+  const { data } = useQuery({
+    queryKey: ['user-profile'],
+    queryFn: onUserInfo,
+  })
+
+  const integrated = data?.data?.integrations.find(
+    (integration) => integration.name === strategy,
+  )
   return (
     <div
       className={
@@ -26,11 +38,13 @@ const IntegrationCard = ({ strategy, icon, description, title }: Props) => {
         </p>
       </div>
       <Button
+        onClick={onInstaOauth}
+        disabled={integrated?.name === strategy}
         className={
           'bg-gradient-to-br text-white rounded-full text-lg from-[#3352CC] font-medium to-[#1C2D70] hover:opacity-70 transition duration-100'
         }
       >
-        Connected
+        {integrated ? 'Connected' : 'Connect'}
       </Button>
     </div>
   )
