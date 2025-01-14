@@ -1,6 +1,19 @@
 import { useMutationData } from '@/hooks/use-mutation-data'
-import { createAutomations, updateAutomationName } from '@/actions/automations'
+import {
+  createAutomations,
+  deleteKeyword,
+  saveKeyword,
+  saveListener,
+  savePosts,
+  saveTrigger,
+  updateAutomationName,
+} from '@/actions/automations'
 import { useEffect, useRef, useState } from 'react'
+import { z } from 'zod'
+import useZodForm from '@/hooks/use-zod-form'
+import { AppDispatch, useAppSelector } from '@/redux/store'
+import { useDispatch } from 'react-redux'
+import { TRIGGER } from '@/redux/slices/automation'
 
 export const useCreateAutomation = (id?: string) => {
   const { isPending, mutate } = useMutationData(
@@ -38,6 +51,7 @@ export const useEditAutomation = (automationId: string) => {
         }
       }
     }
+
     document.addEventListener('mousedown', handleClickOutside)
     return () => {
       document.removeEventListener('mousedown', handleClickOutside)
@@ -51,4 +65,124 @@ export const useEditAutomation = (automationId: string) => {
     inputRef,
     isPending,
   }
+}
+
+export const useListener = (id: string) => {
+  const [listener, setListener] = useState<'MESSAGE' | 'SMARTAI'>('MESSAGE')
+  const promptSchema = z.object({
+    prompt: z.string().min(1),
+    reply: z.string(),
+  })
+
+  const { isPending, mutate } = useMutationData(
+    ['create-listener'],
+    (data: { prompt: string; reply: string }) =>
+      saveListener(id, listener || 'MESSAGE', data.prompt, data.reply),
+    'automation-info',
+  )
+
+  const { onFormSubmit, reset, watch, register, errors } = useZodForm(
+    promptSchema,
+    mutate,
+  )
+
+  const onSetListener = (type: 'MESSAGE' | 'SMARTAI') => setListener(type)
+  return {
+    onSetListener,
+    register,
+    onFormSubmit,
+    listener,
+    isPending,
+  }
+}
+
+export const useTriggers = (id: string) => {
+  const types = useAppSelector(
+    (state) => state.AutomationReducer.trigger?.types,
+  )
+  const dispatch: AppDispatch = useDispatch()
+
+  const onSetTrigger = (type: 'COMMENT' | 'DM') =>
+    dispatch(TRIGGER({ trigger: { type } }))
+
+  const { isPending, mutate } = useMutationData(
+    ['add-trigger'],
+    (data: { types: string[] }) => saveTrigger(id, data.types),
+    'automation-info',
+  )
+  const onSaveTrigger = () => mutate({ types })
+  return {
+    types,
+    onSetTrigger,
+    onSaveTrigger,
+    isPending,
+  }
+}
+
+export const useKeywords = (id: string) => {
+  const [keyword, setKeyword] = useState<string>('')
+
+  const onValueChange = (e: React.ChangeEvent<HTMLInputElement>) =>
+    setKeyword(e.target.value)
+
+  const { mutate } = useMutationData(
+    ['add-keyword'],
+    (data: { keyword: string }) => saveKeyword(id, data.keyword),
+    'automation-info',
+    () => setKeyword(''),
+  )
+
+  const onKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      mutate({ keyword: keyword })
+      setKeyword('')
+    }
+  }
+
+  const { mutate: deleteMutation } = useMutationData(
+    ['delete-keywords'],
+    (data: { id: string }) => deleteKeyword(data.id),
+    'automation-info',
+  )
+
+  return {
+    keyword,
+    onValueChange,
+    onKeyPress,
+    deleteMutation,
+  }
+}
+
+export const useAutomationPosts = (id: string) => {
+  const [posts, setPosts] = useState<
+    {
+      postid: string
+      caption?: string
+      media: string
+      mediaType: 'IMAGE' | 'VIDEO' | 'CAROSEL_ALBUM'
+    }[]
+  >([])
+
+  const onSelectPost = (post: {
+    postid: string
+    caption?: string
+    media: string
+    mediaType: 'IMAGE' | 'VIDEO' | 'CAROSEL_ALBUM'
+  }) => {
+    setPosts((prevItems) => {
+      if (prevItems.find((p) => p.postid === post.postid)) {
+        return prevItems.filter((item) => item.postid !== post.postid)
+      } else {
+        return [...prevItems, post]
+      }
+    })
+  }
+
+  const { mutate, isPending } = useMutationData(
+    ['attach-posts'],
+    () => savePosts(id, posts),
+    'automation-info',
+    () => setPosts([]),
+  )
+  return { posts, onSelectPost, mutate, isPending }
 }
